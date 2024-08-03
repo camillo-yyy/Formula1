@@ -34,49 +34,46 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="960.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unicam.cs.app.JavaFXController">
+<VBox prefHeight="480.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unicam.cs.app.JavaFXController">
   <children>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefWidth="910.0" VBox.vgrow="ALWAYS">
       <children>
-            <VBox alignment="CENTER" cache="true" depthTest="DISABLE" layoutY="42.0" prefHeight="335.0" prefWidth="164.0" spacing="15.0">
+            <VBox alignment="CENTER" cache="true" depthTest="DISABLE" layoutY="42.0" prefHeight="374.0" prefWidth="164.0" spacing="15.0">
                <children>
                   <Button fx:id="loadTrack" mnemonicParsing="false" onAction="#handleLoadTrackPressed" text="Load Track">
                   </Button>
                   <Button fx:id="loadCars" mnemonicParsing="false" onAction="#handleLoadCarsPressed" text="Load Cars" />
                   <Button fx:id="start" mnemonicParsing="false" onAction="#handleStartPressed" text="Start Race" />
-                  <Button alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" text="Quit" textAlignment="CENTER" />
+                  <Button fx:id="quit" alignment="CENTER" contentDisplay="TOP" mnemonicParsing="false" onAction="#handleQuitPressed" text="Quit" textAlignment="CENTER" />
                </children>
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
             </VBox>
-            <HBox alignment="CENTER" layoutX="-2.0" prefHeight="0.0" prefWidth="646.0">
+            <HBox alignment="CENTER" layoutX="-2.0" prefHeight="41.0" prefWidth="886.0">
                <children>
-                  <TextArea prefHeight="20.0" prefWidth="200.0" promptText="Formula1" text=" Formula1 Race Track Game">
+                  <Label prefHeight="17.0" prefWidth="244.0" text="Formula 1 Racetrack Game" textAlignment="CENTER" textFill="#680000" textOverrun="CENTER_ELLIPSIS">
                      <font>
-                        <Font name="System Bold" size="13.0" />
+                        <Font name="Consolas Bold" size="18.0" />
                      </font>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </TextArea>
+                  </Label>
                </children>
             </HBox>
-            <SplitPane dividerPositions="0.1724137931034483" layoutX="164.0" layoutY="42.0" orientation="VERTICAL" prefHeight="355.0" prefWidth="479.0">
+            <SplitPane dividerPositions="0.13179916317991633" layoutX="164.0" layoutY="42.0" orientation="VERTICAL" prefHeight="480.0" prefWidth="720.0">
               <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="65.0" prefWidth="477.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="143.0" prefWidth="715.0">
                      <children>
                         <Button fx:id="step" disable="true" layoutX="14.0" layoutY="17.0" mnemonicParsing="false" onAction="#handleStepPressed" text="Next Step" />
                      </children>
                   </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="239.0" prefWidth="323.0" />
+                <AnchorPane fx:id="polygon" minHeight="0.0" minWidth="0.0" prefHeight="480.0" prefWidth="640.0" style="-fx-background-color: green;" />
               </items>
             </SplitPane>
       </children>

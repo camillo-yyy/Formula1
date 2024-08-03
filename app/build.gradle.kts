@@ -21,5 +21,5 @@ javafx {
 
 application {
     // Define the main class for the application.
-    mainClass = "it.unicam.cs.app.App"
+    mainClass = "it.unicam.cs.formula1.app.App"
 }
