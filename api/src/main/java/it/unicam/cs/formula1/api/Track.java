@@ -47,9 +47,8 @@ public interface Track {
    List<Point> getCorners();
 
    /**
-    * @param s take a segment
-    * @return true if the given segment trespass a track border
+    * @return list of track's border
     */
-   boolean isTrespassing(Segment s);
-   
+    List<Segment> getBorders();
+
 }

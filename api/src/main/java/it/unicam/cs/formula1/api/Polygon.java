@@ -49,50 +49,32 @@ public class Polygon extends PolygonalChain{
         List<Point> tempInters;
         int i = 0;
 
-        // if the point is a vertex then it is contained
-        if(this.points.contains(p)) return true;
+        for(Segment ss : segments) if(ss.contains(p)) return true; // if point is contained in the segments
         do{
             // empty the list
             tempInters = new LinkedList<>();
             // creating a ray from the point to 'infinite'
-            Segment ray = new Segment(p, new Point(BIG_NUMBER, p.getY()+i%this.points.size())); // should be replaced with a max value
+            Segment ray = new Segment(p, new Point(BIG_NUMBER, p.getY()+i%this.points.size())); 
             for (Segment segment : segments) {
 
                 Point x = ray.intersects(segment); // calculate the point of intersection
-                // if the point is not null and not present in the list of the intersection then
-                // add to a temporary list
+                // if the point is not null add to a temporary list of intersection points
                 if(x!=null) tempInters.add(x);
 
             }
             i=+1;
-        }while(containsAny(tempInters)); // verify if any vertex was taken
-        // if yes then do it again changing the angle of the ray
-
-
+        }while(containsAny(tempInters)); // verify if any vertex was an intersection point
+        // if yes then calculate intersections again changing the angle of the ray
+        
         return tempInters.size() % 2 == 1;
-
     }
 
     /**
-     * verify if any vertex of the polygon is included in the given list of point
+     * verify if any vertex of the polygon is contained in the given list of point
      */ 
     public boolean containsAny(List<Point> intersxray) {
         for (Point point : this.points) {
             if(intersxray.contains(point)) return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param s Segment to test
-     * @return if segment give intersects any of the Polygon segments
-     */
-    public boolean intersectsAny(Segment s){
-        List<Segment> segments = Polygon.polygonToSegments(this);
-        for (Segment segment : segments) {
-
-            if(s.intersects(segment) != null) return true;
-
         }
         return false;
     }
@@ -117,7 +99,7 @@ public class Polygon extends PolygonalChain{
         
         // segment that connect last point to first one
         ls.add(new Segment(i, first));
-        
+
         return ls;
 
     }

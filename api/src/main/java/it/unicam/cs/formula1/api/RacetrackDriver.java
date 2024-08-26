@@ -44,9 +44,6 @@ public class RacetrackDriver implements Driver {
    }
    
    public Segment drive(){
-      //ExecutorService exec = Executors.newCachedThreadPool();
-      //CompletableFuture<Direction> cf = CompletableFuture.supplyAsync(() -> resolver.getNextMove());
-      //return this.personalCar.move(cf.join());
       return this.personalCar.move(resolver.getNextMove());
    }
 

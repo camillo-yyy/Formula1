@@ -23,7 +23,7 @@ package it.unicam.cs.formula1.api;
 /**
  * Producer/Consumer Shared variable with 2 waiting queues to set/get generic T value
  */
-public class SharedVar<T> {
+public final class SharedVar<T> {
 
    private volatile T var;
    private boolean empty;
@@ -60,7 +60,6 @@ public class SharedVar<T> {
       this.empty = false;
       this.var = d;
       this.notifyAll();
-
    }
 
    private boolean isEmpty() {

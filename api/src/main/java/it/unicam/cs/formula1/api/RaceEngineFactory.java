@@ -30,8 +30,8 @@ public class RaceEngineFactory implements RaceFactory{
     * @param ds List of drivers
     * @return a Race
     */
-   public Race createRace(Track t, List<Driver> ds){
-      return new RaceEngine(t, ds);
+   public Race createRace(Track t, List<Driver> ds, RaceRule r){
+      return new RaceEngine(t, ds, r);
    }
 
 }

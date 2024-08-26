@@ -22,9 +22,9 @@ package it.unicam.cs.formula1.api;
 /**
  * Defines an immutable point in floating x, y 
  */
-public class Point {
-   // attributes
+public final class Point {
 
+   // attributes
    private final double x;
    private final double y;
 

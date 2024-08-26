@@ -12,10 +12,10 @@ import java.util.List;
 
 public class RacetrackCarLoaderTest {
    @Test void testParse() {
-      CarLoader x = new RacetrackCarLoader(new InputLoader(), new AILoader());
+      DriverLoader x = new RacetrackDriverLoader(new RacetrackCarLoader(), new InputLoader(), new BaseBotLoader());
 
       try{
-         List<Driver> k = x.parse(Paths.get("..\\api\\src\\main\\resources\\DefaultCars1.csv"));
+         List<Driver> k = x.parseDrivers(Paths.get("..\\api\\src\\main\\resources\\DefaultCars1.csv"));
          String a = "VER,11,15,U";
          String[] s = a.split(",");
          assertEquals("VER", s[0]);

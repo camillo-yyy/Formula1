@@ -33,19 +33,15 @@ import java.util.stream.*;
 import it.unicam.cs.formula1.api.BotInterface;
 import it.unicam.cs.formula1.api.Direction;
 import it.unicam.cs.formula1.api.Driver;
-import it.unicam.cs.formula1.api.HumanInterface;
-import it.unicam.cs.formula1.api.InputResolver;
 import it.unicam.cs.formula1.api.RaceStatus;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader; 
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
@@ -85,6 +81,7 @@ public class JavaFXController {
    @FXML Button upLeft;
    @FXML Label leaderboard;
    @FXML TextArea leaderText;
+   private List<Circle> nextMoves;
 
    private Alert a;
 
@@ -95,6 +92,7 @@ public class JavaFXController {
    private Map<Driver, List<Circle>> carPoints;
    private Map<Driver, Label> carNames;
 
+
    public JavaFXController(){
       fileChooser = new FileChooser();
       fileChooser.setInitialDirectory(new File("..\\api\\src\\main\\resources"));
@@ -102,6 +100,7 @@ public class JavaFXController {
 
       this.carNames = new HashMap<>();
       this.carPoints = new HashMap<>();
+      this.nextMoves = new LinkedList<>();
    }
 
 
@@ -110,32 +109,36 @@ public class JavaFXController {
          this.controller = c;
          this.primaryStage = ps;
 
-         // create grid
-         List<Line> gridLines = new LinkedList<>();
-         for(int i=0; i<N_ROWS; i++){
-            Line gridLine = new Line(ResolutionScaler.upScaler(i, 10), 0f, ResolutionScaler.upScaler(i, 10), ResolutionScaler.upScaler(N_COLUMNS, 10));
-            gridLine.setOpacity(0.20f);
-            gridLines.add(gridLine);
-         }
-         for(int i=0; i<N_COLUMNS; i++){
-            Line gridLine = new Line(0f, ResolutionScaler.upScaler(i, 10), ResolutionScaler.upScaler(N_ROWS, 10), ResolutionScaler.upScaler(i, 10));
-            gridLine.setOpacity(0.20f);
-            gridLines.add(gridLine);
-         }
-         // add grid to panel
-         this.circuitPanel.getChildren().addAll(gridLines);
+         printGrid();
 
          //disable keypad
          this.setDisableKeyPad(true);
          this.leaderText.setEditable(false);
          this.leaderText.setWrapText(true);
-
+         this.circuit = new Polygon();
+         this.circuitPanel.getChildren().addAll(this.circuit);
       }
       else return;
    }
 
-   public void handleLoadTrackPressed(ActionEvent e){
+   private void printGrid(){
+      // create grid
+      List<Line> gridLines = new LinkedList<>();
+      for(int i=0; i<N_ROWS; i++){
+         Line gridLine = new Line(ResolutionScaler.upScaler(i, 10), 0f, ResolutionScaler.upScaler(i, 10), ResolutionScaler.upScaler(N_COLUMNS, 10));
+         gridLine.setOpacity(0.20f);
+         gridLines.add(gridLine);
+      }
+      for(int i=0; i<N_COLUMNS; i++){
+         Line gridLine = new Line(0f, ResolutionScaler.upScaler(i, 10), ResolutionScaler.upScaler(N_ROWS, 10), ResolutionScaler.upScaler(i, 10));
+         gridLine.setOpacity(0.20f);
+         gridLines.add(gridLine);
+      }
+      // add grid to panel
+      this.circuitPanel.getChildren().addAll(gridLines);
+   }
 
+   public void handleLoadTrackPressed(ActionEvent e){
       File selectedFile = fileChooser.showOpenDialog(this.primaryStage);
       fileChooser.getExtensionFilters().add(new ExtensionFilter(".csv file only", "*.csv"));
       // todo maybe optimize this
@@ -144,11 +147,9 @@ public class JavaFXController {
          this.loadTrack.setAccessibleText("Loaded");
          this.controller.loadTrack(selectedFile.getAbsolutePath());
       }
-
    }
 
    public void handleLoadCarsPressed(ActionEvent e){
-
       File selectedFile = fileChooser.showOpenDialog(this.primaryStage);
       fileChooser.getExtensionFilters().add(new ExtensionFilter(".csv file only", "*.csv"));
       if(selectedFile != null){    
@@ -156,7 +157,6 @@ public class JavaFXController {
          this.loadCars.setAccessibleText("Loaded");
          this.controller.loadDrivers(selectedFile.getAbsolutePath());
       }
-
    }
 
    private void displayText(){
@@ -169,7 +169,6 @@ public class JavaFXController {
    }
 
    public void handleStartPressed(ActionEvent e){
-
       // start game
       if(this.controller.start()){
          this.start.setDisable(true);
@@ -186,51 +185,32 @@ public class JavaFXController {
          // show the dialog
          a.show();
       }
-
    }
 
-   private Circle createCircle(double x, double y){
+   private void displayCars(List<Driver> d){
+      for (Driver driver : d) {
+         Label l = this.createLabel(driver.getUsername(), driver.getCar().getPosition().getX(), driver.getCar().getPosition().getY(), Color.RED);
+         Circle c = createCircle(driver.getCar().getPosition().getX(), driver.getCar().getPosition().getY(), Color.BLACK);
+         this.carPoints.put(driver, new LinkedList<Circle>());
+         this.carNames.put(driver, l);
 
-      Circle c = new Circle();
-      c.setCenterX(ResolutionScaler.upScaler(x, SCALE));
-      c.setCenterY(ResolutionScaler.upScaler(y, SCALE));
-      c.setRadius(3.0f); 
-      c.setFill(Color.BLACK);
+         this.carPoints.get(driver).add(c);
 
-      return c;
-   }
-
-   private Label createLabel(String t, double x, double y){
-
-      Label l = new Label(t);
-      l.setTranslateX(ResolutionScaler.upScaler(x, SCALE)); 
-      l.setTranslateY(ResolutionScaler.upScaler(y, SCALE));
-      l.setTextFill(Color.RED);
-
-      return l;
+         this.circuitPanel.getChildren().add(c);
+         this.circuitPanel.getChildren().add(l);
+      }
    }
 
    // refresh car on the grid and create a movement path
    public void refreshCars() {
-
       List<Driver> driverCars = this.controller.getModel().getCurrentDrivers();
       if(this.carPoints.isEmpty()){
-         for (Driver driver : driverCars) {
-            Label l = this.createLabel(driver.getUsername(), driver.getCar().getPosition().getX(), driver.getCar().getPosition().getY());
-            Circle c = createCircle(driver.getCar().getPosition().getX(), driver.getCar().getPosition().getY());
-            this.carPoints.put(driver, new LinkedList<Circle>());
-            this.carNames.put(driver, l);
-
-            this.carPoints.get(driver).add(c);
-
-            this.circuitPanel.getChildren().add(c);
-            this.circuitPanel.getChildren().add(l);
-         }
+         this.displayCars(driverCars);
       }
       else {
          for (Driver driver : driverCars) {
             // create new circle
-            Circle c = createCircle(driver.getCar().getPosition().getX(), driver.getCar().getPosition().getY());
+            Circle c = createCircle(driver.getCar().getPosition().getX(), driver.getCar().getPosition().getY(), Color.BLACK);
             // getting last circle position
             Circle last = this.carPoints.get(driver).getLast();
             // create a path
@@ -245,13 +225,33 @@ public class JavaFXController {
             this.carNames.get(driver).setTranslateY(ResolutionScaler.upScaler(driver.getCar().getPosition().getY(), SCALE));
          }
       }
+   }
 
+   public void displayTurnDriverMove(){
+      if(this.controller.getModel().turnDriver() != null){
+
+         Circle c1 = createCircle(this.controller.getModel().turnDriver().getCar().getNextPosition().getX(), 
+            this.controller.getModel().turnDriver().getCar().getNextPosition().getY(), Color.TRANSPARENT);
+         c1.setStroke(Color.CORAL);
+
+         this.nextMoves.add(c1);
+         for(Direction d : Direction.values()){
+            Circle c2 = createCircle(this.controller.getModel().turnDriver().getCar().getNextPosition().getAdjacent(d).getX(), 
+            this.controller.getModel().turnDriver().getCar().getNextPosition().getAdjacent(d).getY(), Color.TRANSPARENT);
+            c2.setStroke(Color.CORAL);
+            this.nextMoves.add(c2);
+         }
+         this.circuitPanel.getChildren().addAll(this.nextMoves);        
+      }
+   }
+
+   public void undisplayTurnDriverMove(){
+      this.circuitPanel.getChildren().removeAll(nextMoves);
+      this.nextMoves.clear();
    }
 
    public void handleStepPressed(ActionEvent e){
-
-      this.step.setDisable(true);
-      this.setDisableKeyPad(false);
+      this.prepareToInput();
 
       // create a thread to execute turn in background while main UI thread continue his execution
       CompletableFuture.runAsync(() -> {
@@ -261,12 +261,10 @@ public class JavaFXController {
          // later on the main javafx thread to ensure graphic changes to be displayed asynchrounosly
          Platform.runLater(() -> {
             this.refreshCars();
-
             if(this.controller.getModel().getRaceStatus() == RaceStatus.FINISHED) {
                this.displayPopup();
             }
-            this.setDisableKeyPad(true);
-            this.step.setDisable(false);
+            this.disableInput();
          });
       });
 
@@ -285,14 +283,10 @@ public class JavaFXController {
          Label label;
          // create a label 
          if(this.controller.getModel().getWinner() != null){
-            label = new Label("Race winner is "+this.controller.getModel().getWinner().getUsername()); 
+            label = createLabel("Race winner is "+this.controller.getModel().getWinner().getUsername(), 0, 0, Color.BLACK);
          }
-         else label = new Label("No winner for this race :(");
-         label.setLayoutX(10f);
-         label.setLayoutY(50f);
-         label.setAlignment(Pos.CENTER);
-         label.setContentDisplay(ContentDisplay.CENTER);
-
+         else label = createLabel("No winner for this race", 0, 0, Color.BLACK);
+         
          popup.getContent().add(label);
          popup.show(primaryStage);
       }
@@ -302,14 +296,7 @@ public class JavaFXController {
    }
 
    private void inputSend(Direction d){
-      
-      InputResolver i = this.controller.getModel().turnDriver().getInputStrategy();
-
-      if(i instanceof HumanInterface) {
-         HumanInterface input = (HumanInterface) i;
-         input.sendDirection(d);
-      }
-     
+      this.controller.sendInput(d);
    }
 
    public void handleUpLeft(ActionEvent e){
@@ -353,11 +340,6 @@ public class JavaFXController {
    }
 
    private void displayPolygon(){
-
-      if(this.circuit == null){
-         this.circuit = new Polygon();
-         this.circuitPanel.getChildren().addAll(this.circuit);
-      }
       List<Double> listOfPoints = this.controller
                         .getModel()
                         .getTrack()
@@ -375,21 +357,17 @@ public class JavaFXController {
       this.circuit.setStrokeWidth(2);
 
       // print starting line
-      Line startingLine = new Line(ResolutionScaler.upScaler(this.controller.getModel().getTrack().getStartingLine().getX().getX(), SCALE), 
-      ResolutionScaler.upScaler(this.controller.getModel().getTrack().getStartingLine().getX().getY(), SCALE), 
-      ResolutionScaler.upScaler(this.controller.getModel().getTrack().getStartingLine().getY().getX(), SCALE), 
-      ResolutionScaler.upScaler(this.controller.getModel().getTrack().getStartingLine().getY().getY(), SCALE));
-      startingLine.setStroke(Color.RED);
-      startingLine.setStrokeWidth(2);
+      Line startingLine = this.createLine(this.controller.getModel().getTrack().getStartingLine().getX().getX(),
+                        this.controller.getModel().getTrack().getStartingLine().getX().getY(),
+                        this.controller.getModel().getTrack().getStartingLine().getY().getX(),
+                        this.controller.getModel().getTrack().getStartingLine().getY().getY(), Color.RED, 2);
       this.circuitPanel.getChildren().add(startingLine);
 
       // print ending line
-      Line endingLine = new Line(ResolutionScaler.upScaler(this.controller.getModel().getTrack().getEndingLine().getX().getX(), SCALE), 
-      ResolutionScaler.upScaler(this.controller.getModel().getTrack().getEndingLine().getX().getY(), SCALE), 
-      ResolutionScaler.upScaler(this.controller.getModel().getTrack().getEndingLine().getY().getX(), SCALE), 
-      ResolutionScaler.upScaler(this.controller.getModel().getTrack().getEndingLine().getY().getY(), SCALE));
-      endingLine.setStroke(Color.GREEN);
-      endingLine.setStrokeWidth(2);
+      Line endingLine = this.createLine(this.controller.getModel().getTrack().getEndingLine().getX().getX(),
+                     this.controller.getModel().getTrack().getEndingLine().getX().getY(),
+                     this.controller.getModel().getTrack().getEndingLine().getY().getX(),
+                     this.controller.getModel().getTrack().getEndingLine().getY().getY(), Color.GREEN, 2);
       this.circuitPanel.getChildren().add(endingLine);
 
    }
@@ -406,5 +384,46 @@ public class JavaFXController {
       this.downRight.setDisable(value);
    }
 
+   private void prepareToInput(){
+      this.step.setDisable(true);
+      this.setDisableKeyPad(false);
+      this.displayTurnDriverMove();
+   }
+
+   private void disableInput(){
+      this.setDisableKeyPad(true);
+      this.step.setDisable(false);
+      this.undisplayTurnDriverMove();
+   }
+
+   private Circle createCircle(double x, double y, Color color){
+      Circle c = new Circle();
+      c.setCenterX(ResolutionScaler.upScaler(x, SCALE));
+      c.setCenterY(ResolutionScaler.upScaler(y, SCALE));
+      c.setRadius(3.0f); 
+      c.setFill(color);
+
+      return c;
+   }
+
+   private Label createLabel(String t, double x, double y,  Color color){
+      Label l = new Label(t);
+      l.setTranslateX(ResolutionScaler.upScaler(x, SCALE)); 
+      l.setTranslateY(ResolutionScaler.upScaler(y, SCALE));
+      l.setTextFill(color);
+
+      return l;
+   }
+
+   private Line createLine(double x1, double y1, double x2, double y2, Color x, double width){
+      Line line = new Line(ResolutionScaler.upScaler(x1, SCALE), 
+      ResolutionScaler.upScaler(y1, SCALE), 
+      ResolutionScaler.upScaler(x2, SCALE), 
+      ResolutionScaler.upScaler(y2, SCALE));
+      line.setStroke(x);
+      line.setStrokeWidth(width);
+      
+      return line;
+   }
 
 }

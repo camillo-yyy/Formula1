@@ -30,29 +30,30 @@ public interface Race {
 
 
    /**
-    * Returns the Driver that was scheduled by nextStep() method
-    * @return turn driver which is still computing his move or just finished it
+    * Returns the Driver that will be scheduled by nextStep() method
+    * @return next turn driver 
     */
    public Driver turnDriver();
 
    /**
+    * Advance Race simulation Status in following order:
+      NOTSTARTED, STARTED, FINISHED
     * Calculate the next Turn driver then
-    * compute next step of race simulation using current turn's driver logic. 
-    *
-    * @return Driver involved in the action
+    * compute next step of race simulation using current Race Rule sets. 
+    * 
+    * @return Driver involved in the action, null if no step was computed
     */
    Driver nextStep();
-
-   /**
-    * Setup and Prepare the race to start
-    * @return  true if race started false otherwise
-    */
-   boolean startRace();
 
    /**
     * @return current race status
     */
    RaceStatus getRaceStatus();
+
+   /**
+    * @return current race rule set
+    */
+   RaceRule getRaceRule();
 
    /**
     * Return all drivers enlisted for the race

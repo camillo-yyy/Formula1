@@ -59,8 +59,8 @@ public class Racetrack implements Track {
    }
 
    @Override
-   public boolean isTrespassing(Segment s) {
-      return this.points.intersectsAny(s);
+   public List<Segment> getBorders() {
+      return Polygon.polygonToSegments(points);
    }
    
 }

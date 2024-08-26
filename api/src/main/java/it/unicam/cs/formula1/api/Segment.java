@@ -20,7 +20,7 @@
  */
 package it.unicam.cs.formula1.api;
 
-public class Segment {
+public final class Segment {
 
   // Small epsilon used for double value comparison.
   private static final double EPS = 1e-5;
@@ -64,6 +64,8 @@ public class Segment {
    /**
     * Check if two segments intersects (based on article "Intersection of two lines in three-space" by Ronald Goldman, 
     published in Graphics Gems, page 304).
+
+    Segment with same starting and ending point does not intersect other segments, use method contains to check single point segments.
     * @param i segment to check
     * @return point of intersection
     */
@@ -87,9 +89,8 @@ public class Segment {
       double qps = Segment.crossProduct(new Point(q.getX()-p.getX(), q.getY()-p.getY()), s);
       double t = qps / rs;
       double u = qpr / rs;
-      if(rs == 0){ // if determinant is 0 then no intersection
+      if(rs == 0) // if determinant is 0 then no intersection
          return null;
-      }
       else if(rs != 0 
       && t >= 0 // if calculated solutions t and u are within 0 and 1 then they intersects within the segment 
       && t <= 1 

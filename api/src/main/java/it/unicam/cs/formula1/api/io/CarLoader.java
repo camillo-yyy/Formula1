@@ -23,11 +23,10 @@ package it.unicam.cs.formula1.api.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import it.unicam.cs.formula1.api.Driver;
+import it.unicam.cs.formula1.api.Car;
 
 /**
- * Defines a loader for Car and Driver from file
+ * Defines a loader for Car  from file
  */
 public interface CarLoader {
    
@@ -37,7 +36,7 @@ public interface CarLoader {
     * @return a Track
     * @throws IOException
     */
-   List<Driver> parse(String s) throws IOException;
+   Car parse(String s) throws IOException;
 
 
    /**
@@ -46,7 +45,7 @@ public interface CarLoader {
     * @return
     * @throws IOException
     */
-   default List<Driver> parse(Path path) throws IOException { 
+   default Car parse(Path path) throws IOException { 
       return parse(Files.readString(path));
    }
 

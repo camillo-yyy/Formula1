@@ -109,6 +109,31 @@ public class PolygonTest {
         assertEquals(true, t.contains(p2));
     }
 
+    @Test void testPointInPolygon4() {
+        List<Point> s = new LinkedList<>();
+        s.add(new Point(0, 4));
+        s.add(new Point(5, 4));
+        s.add(new Point(5, 0));
+        s.add(new Point(0, 0));
+
+        Polygon t = new Polygon(s);
+
+        Point p1 = new Point(2, 2); //in
+        Point p2 = new Point(2, 4); //in
+        Point p3 = new Point(5, 2); // in
+        Point p4 = new Point(0, 2); // in
+        Point p5 = new Point(-2, 2); //out
+        Point p6 = new Point(-2, -2); //out
+        Point p7 = new Point(0, 4); //in
+        assertEquals(true, t.contains(p1));
+        assertEquals(true, t.contains(p2));
+        assertEquals(true, t.contains(p3));
+        assertEquals(true, t.contains(p4));
+        assertEquals(false, t.contains(p5));
+        assertEquals(false, t.contains(p6));
+        assertEquals(true, t.contains(p7));
+
+    }
     /*@Test void testThrowsException() {
         List<Point> s = new LinkedList<>();
         s.add(new Point(0, 0));

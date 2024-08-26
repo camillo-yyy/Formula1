@@ -20,10 +20,8 @@
  */
 package it.unicam.cs.formula1.api;
 
-import java.util.function.BiPredicate;
-
 /**
- * Defines an interface for a bot used to calculate positions on a track given a car
+ * Defines an interface for a bot player used in a RaceTrack game
  */
 public interface BotInterface {
 
@@ -40,6 +38,6 @@ public interface BotInterface {
    /**
     * @param t rule to check positions
     */
-    void setRule(BiPredicate<Point, Track> predicate);
+    void updateRule(RaceRule r);
 
 }

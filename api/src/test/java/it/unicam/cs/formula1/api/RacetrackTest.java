@@ -23,7 +23,7 @@ public class RacetrackTest {
 
       assertEquals(false, t.isOut(new Point(1, 3)));
       assertEquals(true, t.isOut(new Point(11, 3)));
-      assertEquals(true, t.isOut(new Point(0, 3)));
+      assertEquals(false, t.isOut(new Point(0, 3)));
       assertEquals(false, t.isOut(new Point(1, 3)));
       assertEquals(false, t.isOut(new Point(2, 3)));
       assertEquals(false, t.isOut(new Point(1, 2)));

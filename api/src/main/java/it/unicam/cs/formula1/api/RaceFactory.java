@@ -30,5 +30,5 @@ public interface RaceFactory {
     * @param ds List of drivers
     * @return a Race
     */
-   public Race createRace(Track t, List<Driver> ds);
+   public Race createRace(Track t, List<Driver> ds, RaceRule r);
 }

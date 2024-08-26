@@ -29,11 +29,17 @@ public class SegmentTest {
       assertEquals(1, ray.intersects(l2).getY());
       assertEquals(4, ray.intersects(l3).getX());
       assertEquals(1, ray.intersects(l3).getY());
-      
-      Segment x3 = new Segment(new Point(0.0, 0.0), new Point(4.0, 0.0));
-      Point p = new Point(2.0, 0.0);
-      assertEquals(true, x3.contains(p));
 
-
+      Segment x4 = new Segment(new Point(0.0, 0.0), new Point(0.0, 4.0));
+      Segment x5 = new Segment(new Point(1.0, 2.0), new Point(0.0, 2.0));
+      assertEquals(0.0, x4.intersects(x5).getX());
+      assertEquals(2.0, x4.intersects(x5).getY());
   }
+
+  @Test void testContains() {
+   Segment x3 = new Segment(new Point(0.0, 0.0), new Point(4.0, 0.0));
+   Point p = new Point(2.0, 0.0);
+   assertEquals(true, x3.contains(p));
+  }
+
 }

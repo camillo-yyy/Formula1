@@ -54,7 +54,7 @@ public class JavaFXControllerTest {
       LinkedList<Driver> dl = new LinkedList<Driver>();
       dl.add(d1);
       dl.add(d2);
-      RaceEngine re = new RaceEngine(t, dl);
+      RaceEngine re = new RaceEngine(t, dl, new RacetrackRule());
       
       List<Double> array = re
       .getTrack()

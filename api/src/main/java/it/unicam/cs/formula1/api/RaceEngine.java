@@ -22,14 +22,13 @@ package it.unicam.cs.formula1.api;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.BiPredicate;
 
 /**
  * Class that simulates a turn based racetrack match
  * Turn driver is selected through a round robin method.
- * RaceStatus pass from NOTSTARTED to STARTED when raceStart() is executed.
+ * RaceStatus pass from NOTSTARTED to STARTED when nextStep() is executed for the first time.
  * When RaceStatus is STARTED every new step is computed through methdo nextStep()
- * When a final condition is reached status will set FINISHED
+ * When a final condition is reached status is FINISHED
  */
 public class RaceEngine implements Race{
 
@@ -39,133 +38,116 @@ public class RaceEngine implements Race{
    private RaceStatus status;
    private Driver winner;
    private Iterator<Driver> driverIterator;
+   private RaceRule ruleSets;
+   private Driver nextTurnDriver;
 
-   public RaceEngine(Track t, List<Driver> ds){
+   public RaceEngine(Track t, List<Driver> ds, RaceRule s){
       this.track = t;
       this.drivers = ds;
       this.turnDriver = null;
+      this.nextTurnDriver = null;
       this.status = RaceStatus.NOTSTARTED;
       this.winner = null;
       this.driverIterator = this.drivers.iterator();
+      this.ruleSets = s;
    }
 
    @Override
    public Driver turnDriver() {
-      return this.turnDriver;
+      return this.nextTurnDriver;
    }
 
    /**
     * Compute next turn driver using a round robin iterator
+    * @return next turn driver
     */
-   private Driver nextTurnDriver() {
+   private void nextTurnDriver() {
       Driver ret=null;
       int counter=0;
       if(this.status == RaceStatus.STARTED){
-      
          if(!driverIterator.hasNext()) driverIterator = this.drivers.iterator(); // reset it
          
-         while((ret = driverIterator.next()).getCar().getStatus() != Status.ONTRACK) {
-            if(++counter == this.drivers.size()) return null;
-            if(!driverIterator.hasNext()) driverIterator = this.drivers.iterator();
+         while((ret = driverIterator.next()).getCar().getStatus() != Status.ONTRACK) { 
+            if(++counter == this.drivers.size()) this.nextTurnDriver = null; // if all drivers are crashed
+            if(!driverIterator.hasNext()) driverIterator = this.drivers.iterator(); // reset it
          };
       }
-      return ret;
+      this.nextTurnDriver = ret;
    }
 
    /**
     * Calculate if a car is crashing another car with the last movement
-    * @param c avoid calculating with itself
-    * @param p Point to be considered
+    * @param c Car to be considered
     * @return if it's crashing or not
     */
-   private boolean isOccupied(Car c, Point p){
+   private boolean isOccupied(Car c){
       for (Driver driver : drivers) {
-         if(c != driver.getCar() && driver.getCar().getPosition().equals(p)) return true;
+         if(c != driver.getCar() && driver.getCar().getPosition().equals(c.getPosition())) return true;
       }
       return false;
    }
-
  
-   /**
-    * Updating logic of driver that extends BotInterface interface
-    * @param d driver to test
-    */
-   private void updateAI(Driver d){
-
-      InputResolver i = d.getInputStrategy();
-
-      if(i instanceof BotInterface) {
-         BotInterface input = (BotInterface) i;
-         input.updatePosition(d.getCar());
-         input.updateTrack(this.track);
-         input.setRule(ruleOutTrack());
-      }
-
-   }
-
-   public BiPredicate<Point, Track> ruleOutTrack(){
-      return (movement, track) -> {
-         return !track.getStartingLine().contains(movement) 
-         && track.isOut(movement);};
-   }
-
    @Override
    public Driver nextStep() {
-      if(this.status == RaceStatus.STARTED){
-         this.turnDriver = this.nextTurnDriver();
-         if(this.turnDriver == null) {
+      if(startRace()){
+         if((this.turnDriver = this.nextTurnDriver) == null) {
             this.status = RaceStatus.FINISHED;
-            return null;
          }
-         this.updateAI(turnDriver);
+         else {
+            Segment movement = this.turnDriver.drive(); // compute movement
+   
+            // if car movement not allowed
+            if(!this.ruleSets.isMovementAllowed(track, movement)) 
+               this.turnDriver.getCar().setStatus(Status.CRASHED);
+            // if its crashing on another car
+            if(this.isOccupied(this.turnDriver.getCar()))
+               this.turnDriver.getCar().setStatus(Status.CRASHED);
 
-         Segment movement = this.turnDriver.drive();
-
-         // wincondition
-         if(this.track.getEndingLine().intersects(movement) != null) {
-            this.status = RaceStatus.FINISHED;
-            this.winner = this.turnDriver;
-            return this.turnDriver;
+            checkEndRace(track, movement);
          }
-
-         // if car position is out and not on the starting line
-         if(ruleOutTrack().test(movement.getY(), this.track)) 
-            this.turnDriver.getCar().setStatus(Status.CRASHED);
-         // if its crashing on another car
-         if(this.isOccupied(this.turnDriver.getCar(), movement.getY())) 
-            this.turnDriver.getCar().setStatus(Status.CRASHED);
-            
+         this.nextTurnDriver();
          return this.turnDriver;
       }
-      return null;
+      else return null;
    }
 
-   @Override
-   public boolean startRace() {
+   private void checkEndRace(Track t, Segment s){
+      // wincondition
+      if(this.ruleSets.triggersWinCon(track, s)) {
+         this.status = RaceStatus.FINISHED;
+         this.winner = this.turnDriver;
+      }
+   }
+
+   /**
+    * @return true if race status is not NOTSTARTED
+    */
+   private boolean startRace() {
       if(this.status == RaceStatus.NOTSTARTED){
-
          int count=0; // count how many drivers are effectively on starting line
-
          for (Driver driver : this.drivers) {
-            //if(!this.track.isOut(driver.getCar().getPosition()) && !this.isOccupied(driver.getCar(), driver.getCar().getPosition())) {
-            if(this.track.getStartingLine().contains(driver.getCar().getPosition()) && !this.isOccupied(driver.getCar(), driver.getCar().getPosition())) {
+            if(ruleSets.isAllowedToStart(track, driver) && !this.isOccupied(driver.getCar())) {
                driver.getCar().setStatus(Status.ONTRACK);
                count++;
             }
          }
-
          if(count > 0) {
             this.status = RaceStatus.STARTED;
-            return true;
+            this.nextTurnDriver();
          }
          else return false;
       }  
-      else return false;
+      return true;
    }
 
    @Override
    public RaceStatus getRaceStatus() {
       return this.status;
+   }
+
+   @Override
+   public RaceRule getRaceRule() {
+      return this.ruleSets;
    }
 
    @Override
@@ -182,7 +164,5 @@ public class RaceEngine implements Race{
    public Driver getWinner(){
       return this.winner;
    }
-
-
 
 }

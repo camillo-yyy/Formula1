@@ -25,10 +25,15 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import it.unicam.cs.formula1.api.Race;
+import it.unicam.cs.formula1.api.BotInterface;
+import it.unicam.cs.formula1.api.Direction;
 import it.unicam.cs.formula1.api.Driver;
+import it.unicam.cs.formula1.api.HumanInterface;
+import it.unicam.cs.formula1.api.InputResolver;
 import it.unicam.cs.formula1.api.RaceFactory;
+import it.unicam.cs.formula1.api.RaceRule;
 import it.unicam.cs.formula1.api.Track;
-import it.unicam.cs.formula1.api.io.CarLoader;
+import it.unicam.cs.formula1.api.io.DriverLoader;
 import it.unicam.cs.formula1.api.io.TrackLoader;
 
 /**
@@ -39,21 +44,23 @@ public class SetupController {
    private ConsoleView console;
    private Race race;
    private TrackLoader trackLoader;
-   private CarLoader carLoader;
+   private DriverLoader driverLoader;
    private RaceFactory raceFactory;
+   private RaceRule raceRule;
 
    // loaded from file
    private Track track;
    private List<Driver> drivers;
 
-   public SetupController(TrackLoader t, CarLoader c, RaceFactory r){ 
+   public SetupController(TrackLoader t, DriverLoader d, RaceFactory r, RaceRule s){ 
       this.trackLoader = t;
-      this.carLoader = c;
       this.raceFactory = r;
+      this.raceRule = s;
+      this.driverLoader = d;
    }
 
-   public static SetupController getSetupController(TrackLoader t, CarLoader c, RaceFactory r) {
-      return new SetupController(t, c ,r);
+   public static SetupController getSetupController(TrackLoader t, DriverLoader d, RaceFactory r, RaceRule s) {
+      return new SetupController(t, d, r, s);
    }
 
    public void loadTrack(String urlTrack) {
@@ -70,7 +77,7 @@ public class SetupController {
    public void loadDrivers(String urlCar) {
 
       try{
-         this.drivers = carLoader.parse(Paths.get(urlCar));
+         this.drivers = driverLoader.parseDrivers(Paths.get(urlCar));
       }
       catch(IOException e){
          System.out.println(e.getMessage());;
@@ -78,12 +85,40 @@ public class SetupController {
 
    }
 
+   /**
+    * Updating logic of driver that extends BotInterface interface
+    * @param d driver to test
+    */
+   private void setupBotDrivers(){
+
+      for(Driver d : this.drivers){
+         InputResolver i = d.getInputStrategy();
+
+         if(i instanceof BotInterface) {
+            BotInterface input = (BotInterface) i;
+            input.updateRule(this.race.getRaceRule());
+            input.updateTrack(this.race.getTrack());
+            input.updatePosition(d.getCar());
+         }
+      }
+
+   }
+
+   public void sendInput(Direction d){
+      InputResolver i = this.getModel().turnDriver().getInputStrategy();
+
+      if(i instanceof HumanInterface) {
+         HumanInterface input = (HumanInterface) i;
+         input.sendDirection(d);
+      }
+   }
+
    public boolean start(){
 
       if(this.track != null && this.drivers != null){      
-         this.race = raceFactory.createRace(this.track, this.drivers); 
+         this.race = raceFactory.createRace(this.track, this.drivers, this.raceRule);
+         this.setupBotDrivers();
          this.console = new ConsoleView(this.race);
-         this.race.startRace();
          this.console.printDriversState();
          this.console.printRaceStatus();
          return true;

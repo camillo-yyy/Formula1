@@ -21,14 +21,10 @@
 package it.unicam.cs.formula1.api.io;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.LinkedList;
 
-import it.unicam.cs.formula1.api.Driver;
-import it.unicam.cs.formula1.api.InputResolver;
 import it.unicam.cs.formula1.api.Point;
 import it.unicam.cs.formula1.api.RacetrackCar;
-import it.unicam.cs.formula1.api.RacetrackDriver;
+import it.unicam.cs.formula1.api.Car;
 
 /**
  * Class that implements CarLoader
@@ -41,32 +37,11 @@ import it.unicam.cs.formula1.api.RacetrackDriver;
  */
 public class RacetrackCarLoader implements CarLoader {
 
-   private InputResolver h;
-   private InputResolver b;
-
-   public RacetrackCarLoader(InputResolver h, InputResolver b){
-      this.h = h;
-      this.b = b;
-   }
-
-
    @Override
-   public List<Driver> parse(String s) throws IOException {
-      String[] lines = s.split(System.lineSeparator());
+   public Car parse(String s) throws IOException {
 
-      List<Driver> ls = new LinkedList<Driver>();
-
-      for(int i=0; i<lines.length; i++) {
-
-         String[] c = lines[i].split(",");
-         if(c[3].equals("U"))
-         ls.add(new RacetrackDriver(c[0], new RacetrackCar(new Point(Double.parseDouble(c[1]), Double.parseDouble(c[2]))),h));
-         else
-         ls.add(new RacetrackDriver(c[0], new RacetrackCar(new Point(Double.parseDouble(c[1]), Double.parseDouble(c[2]))),b));
-
-      }
-
-      return ls;
+      String[] c = s.split(",");
+      return new RacetrackCar(new Point(Double.parseDouble(c[0]), Double.parseDouble(c[1])));
 
    }
 

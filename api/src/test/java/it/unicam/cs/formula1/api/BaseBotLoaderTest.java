@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AILoaderTest {
+public class BaseBotLoaderTest {
    @Test void testNextDirection() {
 
       Car c = new RacetrackCar(new Point(0.0, 2.0));
-      AILoader ai = new AILoader();
+      BaseBotLoader ai = new BaseBotLoader();
       Driver d = new RacetrackDriver("44", c, ai);
       
       LinkedList<Point> s = new LinkedList<>();
@@ -30,22 +30,46 @@ public class AILoaderTest {
 
       LinkedList<Driver> dl = new LinkedList<Driver>();
       dl.add(d);
-      RaceEngine re = new RaceEngine(t, dl);
+      RaceEngine re = new RaceEngine(t, dl, new RacetrackRule());
+      ai.updatePosition(d.getCar());
+      ai.updateTrack(t);
+      ai.updateRule(new RacetrackRule());
 
-      re.startRace();
+      List<Direction> dirs = ai.getAvailableDirections();
 
+      assertEquals(dirs.get(0), Direction.N);
+      assertEquals(dirs.get(1), Direction.S);
+      assertEquals(dirs.get(2), Direction.E);
+      assertEquals(dirs.get(3), Direction.STILL);
+      assertEquals(dirs.get(4), Direction.NE);
+      assertEquals(dirs.get(5), Direction.SE);
       re.nextStep();
-      assertEquals(1.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getX());
-      assertEquals(2.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getY());
       assertEquals(Status.ONTRACK, re.getCurrentDrivers().getFirst().getCar().getStatus());
       assertEquals(Status.ONTRACK, re.getCurrentDrivers().getLast().getCar().getStatus());
+      assertEquals(1.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getX());
+      assertEquals(2.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getY());
+      List<Direction> dirs2 = ai.getAvailableDirections();
 
+      assertEquals(dirs2.get(0), Direction.N);
+      assertEquals(dirs2.get(1), Direction.W);
+      assertEquals(dirs2.get(2), Direction.S);
+      assertEquals(dirs2.get(3), Direction.E);
+      assertEquals(dirs2.get(4), Direction.STILL);
+      assertEquals(dirs2.get(5), Direction.NW);
+      assertEquals(dirs2.get(6), Direction.SW);
+      assertEquals(dirs2.get(7), Direction.NE);
+      assertEquals(dirs2.get(8), Direction.SE);
+      re.nextStep();
+      assertEquals(Status.ONTRACK, re.getCurrentDrivers().getFirst().getCar().getStatus());
+      assertEquals(Status.ONTRACK, re.getCurrentDrivers().getLast().getCar().getStatus());
+      assertEquals(3.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getX());
+      assertEquals(2.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getY());
   }
 
   @Test void testMoves() {
 
    Car c = new RacetrackCar(new Point(0.0, 2.0));
-   AILoader ai = new AILoader();
+   BaseBotLoader ai = new BaseBotLoader();
    Driver d = new RacetrackDriver("44", c, ai);
    
    LinkedList<Point> s = new LinkedList<>();
@@ -64,7 +88,8 @@ public class AILoaderTest {
 
    ai.updatePosition(d.getCar());
    ai.updateTrack(t);
-   List<Direction> dirs = ai.getAvailableMoves();
+   ai.updateRule(new RacetrackRule());
+   List<Direction> dirs = ai.getAvailableDirections();
 
    assertEquals(dirs.get(0), Direction.N);
    assertEquals(dirs.get(1), Direction.S);

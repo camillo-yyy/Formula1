@@ -20,7 +20,7 @@
  */
 package it.unicam.cs.formula1.app;
 
-public class ResolutionScaler {
+public final class ResolutionScaler {
    
    /**
     * Adjust resolution from model to UI
