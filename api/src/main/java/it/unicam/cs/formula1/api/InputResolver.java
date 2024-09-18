@@ -19,8 +19,11 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package it.unicam.cs.formula1.api;
-@FunctionalInterface
-public interface InputResolver {
+
+/**
+ * Defines an interface which provides a method to get a new Direction
+ */
+public sealed interface InputResolver permits HumanResolver, BotResolver{
 
    /**
     * @return a next direction

@@ -26,7 +26,10 @@ import it.unicam.cs.formula1.api.Driver;
 import it.unicam.cs.formula1.api.Race;
 import it.unicam.cs.formula1.api.RaceStatus;
 
-public class ConsoleView  {
+/**
+ * Class used to implement console view of a race status
+ */
+public final class ConsoleView  {
    
    private Race model;
 

@@ -4,15 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Polygon;
+import it.unicam.cs.formula1.api.geom.Segment;
+import it.unicam.cs.formula1.api.io.DriverLoader;
+import it.unicam.cs.formula1.api.io.RacetrackCarLoader;
+import it.unicam.cs.formula1.api.io.RacetrackDriverLoader;
+import it.unicam.cs.formula1.api.io.RacetrackLoader;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BaseBotLoaderTest {
+public class BaseBotTest {
    @Test void testNextDirection() {
 
       Car c = new RacetrackCar(new Point(0.0, 2.0));
-      BaseBotLoader ai = new BaseBotLoader();
+      BaseBot ai = new BaseBot();
       Driver d = new RacetrackDriver("44", c, ai);
       
       LinkedList<Point> s = new LinkedList<>();
@@ -31,11 +40,8 @@ public class BaseBotLoaderTest {
       LinkedList<Driver> dl = new LinkedList<Driver>();
       dl.add(d);
       RaceEngine re = new RaceEngine(t, dl, new RacetrackRule());
-      ai.updatePosition(d.getCar());
-      ai.updateTrack(t);
-      ai.updateRule(new RacetrackRule());
 
-      List<Direction> dirs = ai.getAvailableDirections();
+      List<Direction> dirs = ai.getAvailableDirections(c, re);
 
       assertEquals(dirs.get(0), Direction.N);
       assertEquals(dirs.get(1), Direction.S);
@@ -48,7 +54,7 @@ public class BaseBotLoaderTest {
       assertEquals(Status.ONTRACK, re.getCurrentDrivers().getLast().getCar().getStatus());
       assertEquals(1.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getX());
       assertEquals(2.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getY());
-      List<Direction> dirs2 = ai.getAvailableDirections();
+      List<Direction> dirs2 = ai.getAvailableDirections(c, re);
 
       assertEquals(dirs2.get(0), Direction.N);
       assertEquals(dirs2.get(1), Direction.W);
@@ -66,10 +72,34 @@ public class BaseBotLoaderTest {
       assertEquals(2.0, re.getCurrentDrivers().getFirst().getCar().getPosition().getY());
   }
 
+
+  @Test void testNextDirection2() {
+
+   try{
+      BaseBot ai = new BaseBot();
+      DriverLoader d = new RacetrackDriverLoader(new RacetrackCarLoader(), new InputLoader(), ai);
+      List<Driver> ds = d.parseDrivers(Paths.get("..\\api\\src\\main\\resources\\DefaultCars3.csv"));
+      Track t = new RacetrackLoader().parse(Paths.get("..\\api\\src\\main\\resources\\DefaultTrack3.csv"));
+   
+      RaceEngine re = new RaceEngine(t, ds, new RacetrackRule());
+   
+      BaseBot s = (BaseBot) ds.getFirst().getInputStrategy();
+   
+      s.getBestDirection(new RacetrackCar(new Point(23, 26)), re);
+
+      assertEquals(s.directionDepthness(new Point(23, 26), re, Direction.NE),12);
+      assertEquals(s.directionDepthness(new Point(23, 26), re, Direction.N),1);
+   }
+   catch (IOException e){
+      return;
+   }
+
+}
+
   @Test void testMoves() {
 
    Car c = new RacetrackCar(new Point(0.0, 2.0));
-   BaseBotLoader ai = new BaseBotLoader();
+   BaseBot ai = new BaseBot();
    Driver d = new RacetrackDriver("44", c, ai);
    
    LinkedList<Point> s = new LinkedList<>();
@@ -84,12 +114,11 @@ public class BaseBotLoaderTest {
    Track t = new Racetrack(new Segment(new Point(0.0, 0.0), new Point(0.0, 4.0)), 
                            new Segment(new Point(10.0, 0.0), new Point(10.0, 4.0)),
                            border);
-
-
-   ai.updatePosition(d.getCar());
-   ai.updateTrack(t);
-   ai.updateRule(new RacetrackRule());
-   List<Direction> dirs = ai.getAvailableDirections();
+                           
+   LinkedList<Driver> dl = new LinkedList<Driver>();
+   dl.add(d);
+   RaceEngine re = new RaceEngine(t, dl, new RacetrackRule());
+   List<Direction> dirs = ai.getAvailableDirections(c, re);
 
    assertEquals(dirs.get(0), Direction.N);
    assertEquals(dirs.get(1), Direction.S);

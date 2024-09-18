@@ -2,7 +2,7 @@ package it.unicam.cs.formula1.app;
 
 import java.util.Objects;
 
-import it.unicam.cs.formula1.api.BaseBotLoader;
+import it.unicam.cs.formula1.api.BaseBot;
 import it.unicam.cs.formula1.api.InputLoader;
 import it.unicam.cs.formula1.api.RaceEngineFactory;
 import it.unicam.cs.formula1.api.RacetrackRule;
@@ -16,7 +16,10 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class JavaFXView extends Application {
+/**
+ * This view maximum visible circuit size is 63*57
+ */
+public final class JavaFXView extends Application {
 
    @Override
    public void start(Stage primaryStage) throws Exception {
@@ -25,7 +28,7 @@ public class JavaFXView extends Application {
       Parent root = mainLoader.load();
       JavaFXController controller = mainLoader.getController();
       SetupController setupController = SetupController.getSetupController(
-         new RacetrackLoader(), new RacetrackDriverLoader(new RacetrackCarLoader(), new InputLoader(), new BaseBotLoader()), new RaceEngineFactory(), new RacetrackRule());
+         new RacetrackLoader(), new RacetrackDriverLoader(new RacetrackCarLoader(), new InputLoader(), new BaseBot()), new RaceEngineFactory(), new RacetrackRule());
 
       controller.init(setupController, primaryStage);
       primaryStage.setTitle("RaceTrack Game");

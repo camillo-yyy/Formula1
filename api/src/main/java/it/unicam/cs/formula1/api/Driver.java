@@ -19,6 +19,9 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package it.unicam.cs.formula1.api;
+
+import it.unicam.cs.formula1.api.geom.Segment;
+
 /**
  * Defines a generic car driver
  */
@@ -35,10 +38,16 @@ public interface Driver {
    Car getCar();
 
    /**
-    * Return the movement executed by driver's car
+    * Return the movement executed by driver's car using InputResolver logic
     * @return movement segment
     */
    public Segment drive();
+
+   /**
+    * Return the movement executed by driver's car on passed Direction
+    * @return movement segment
+    */
+   public Segment drive(Direction d);
 
    /**
     * Return the logic used to calculate how to drive a Car 

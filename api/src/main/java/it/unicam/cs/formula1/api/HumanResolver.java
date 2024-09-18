@@ -1,5 +1,5 @@
 /*
- * Created on Wed May 29 2024
+ * Created on Sat Aug 31 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 Samuele Camilletti
@@ -20,26 +20,14 @@
  */
 package it.unicam.cs.formula1.api;
 
-import java.util.List;
+/**
+ * Defines an interface which provides a method to input a Direction for Direction InputResolver
+ */
+public non-sealed interface HumanResolver extends InputResolver {
 
-public class PolygonalChain implements PolygonalShape{
-   
-   protected final List<Point> points;
-
-   public PolygonalChain(List<Point> s){
-      this.points = s;
-   }
-
-   public List<Point> getPoints() {
-      return points;
-   }
-
-   public Point getStartingPoint(){
-      return points.getFirst();
-   }
-
-   public Point getEndingPoint(){
-      return points.getLast();
-   } 
+   /**
+    * @param d take a direction from a human input source
+    */
+    void sendDirection(Direction d);
 
 }

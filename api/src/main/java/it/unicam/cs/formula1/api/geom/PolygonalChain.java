@@ -18,40 +18,56 @@
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package it.unicam.cs.formula1.api;
+package it.unicam.cs.formula1.api.geom;
 
 import java.util.List;
 
-import it.unicam.cs.formula1.api.geom.Point;
-import it.unicam.cs.formula1.api.geom.Segment;
+public class PolygonalChain implements PolygonalShape{
+   
+   protected final List<Point> points;
 
-public interface Track {
+   public PolygonalChain(List<Point> s){
+      this.points = s;
+   }
+
+   public List<Point> getPoints() {
+      return points;
+   }
+
+   public Point getStartingPoint(){
+      return points.getFirst();
+   }
+
+   public Point getEndingPoint(){
+      return points.getLast();
+   }
+
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((points == null) ? 0 : points.hashCode());
+      return result;
+   }
 
    /**
-    * @param p A point
-    * @return true: point is on track
-              false: point outside track
+    * Two polygonal chains are equals if list of vertex are equals.
     */
-   boolean isOut(Point p);
-
-   /**
-    * @return starting line segment
-    */
-   Segment getStartingLine();
-
-   /**
-    * @return finishing line segment
-    */
-   Segment getEndingLine();
-
-   /**
-    * @return list of track's corners
-    */
-   List<Point> getCorners();
-
-   /**
-    * @return list of track's border
-    */
-    List<Segment> getBorders();
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj)
+         return true;
+      if (obj == null)
+         return false;
+      if (getClass() != obj.getClass())
+         return false;
+      PolygonalChain other = (PolygonalChain) obj;
+      if (points == null) {
+         if (other.points != null)
+            return false;
+      } else if (!points.equals(other.points))
+         return false;
+      return true;
+   } 
 
 }

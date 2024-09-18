@@ -2,6 +2,7 @@ package it.unicam.cs.formula1.api;
 
 import org.junit.jupiter.api.Test;
 
+import it.unicam.cs.formula1.api.geom.Point;
 import it.unicam.cs.formula1.api.io.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

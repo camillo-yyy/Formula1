@@ -1,0 +1,7 @@
+START A NEW GAME
+- When both the track and drivers have been loaded the race can be started with the start button.
+- Cars must be placed on the starting line in order to start.
+
+CREATE A NEW GAME
+- This view supports circuits up to 67 squares wide and 53 squares high.
+- To create a custom race is adviced to look for already existing Tracks and Cars files as an example.

@@ -25,11 +25,10 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import it.unicam.cs.formula1.api.Race;
-import it.unicam.cs.formula1.api.BotInterface;
+import it.unicam.cs.formula1.api.BotResolver;
 import it.unicam.cs.formula1.api.Direction;
 import it.unicam.cs.formula1.api.Driver;
-import it.unicam.cs.formula1.api.HumanInterface;
-import it.unicam.cs.formula1.api.InputResolver;
+import it.unicam.cs.formula1.api.HumanResolver;
 import it.unicam.cs.formula1.api.RaceFactory;
 import it.unicam.cs.formula1.api.RaceRule;
 import it.unicam.cs.formula1.api.Track;
@@ -39,7 +38,7 @@ import it.unicam.cs.formula1.api.io.TrackLoader;
 /**
  * Controller to manage model and console view 
  */
-public class SetupController {
+public final class SetupController {
 
    private ConsoleView console;
    private Race race;
@@ -85,39 +84,20 @@ public class SetupController {
 
    }
 
-   /**
-    * Updating logic of driver that extends BotInterface interface
-    * @param d driver to test
-    */
-   private void setupBotDrivers(){
-
-      for(Driver d : this.drivers){
-         InputResolver i = d.getInputStrategy();
-
-         if(i instanceof BotInterface) {
-            BotInterface input = (BotInterface) i;
-            input.updateRule(this.race.getRaceRule());
-            input.updateTrack(this.race.getTrack());
-            input.updatePosition(d.getCar());
-         }
-      }
-
-   }
-
    public void sendInput(Direction d){
-      InputResolver i = this.getModel().turnDriver().getInputStrategy();
 
-      if(i instanceof HumanInterface) {
-         HumanInterface input = (HumanInterface) i;
-         input.sendDirection(d);
-      }
+      switch(this.getModel().turnDriver().getInputStrategy()){
+         case HumanResolver h: 
+            h.sendDirection(d);
+            break;
+         case BotResolver b: return;
+      };
    }
 
    public boolean start(){
 
       if(this.track != null && this.drivers != null){      
          this.race = raceFactory.createRace(this.track, this.drivers, this.raceRule);
-         this.setupBotDrivers();
          this.console = new ConsoleView(this.race);
          this.console.printDriversState();
          this.console.printRaceStatus();
@@ -145,6 +125,7 @@ public class SetupController {
       this.track = null;
       this.drivers = null;
       this.race = null;
+      this.console = null;
    }
 
    

@@ -18,9 +18,12 @@
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package it.unicam.cs.formula1.api;
+package it.unicam.cs.formula1.api.geom;
+
+import it.unicam.cs.formula1.api.Direction;
+
 /**
- * Defines an immutable point in floating x, y 
+ * Defines an immutable point in a 2D dimension floating space x, y 
  */
 public final class Point {
 
@@ -68,6 +71,9 @@ public final class Point {
       return result;
    }
 
+   /**
+    * Two points are equals if both x point and y point are equals.
+    */
    @Override
    public boolean equals(Object obj) {
       if (this == obj)

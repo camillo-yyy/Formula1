@@ -22,6 +22,8 @@ package it.unicam.cs.formula1.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +32,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.*;
 
-import it.unicam.cs.formula1.api.BotInterface;
+import it.unicam.cs.formula1.api.BotResolver;
 import it.unicam.cs.formula1.api.Direction;
 import it.unicam.cs.formula1.api.Driver;
 import it.unicam.cs.formula1.api.RaceStatus;
@@ -59,7 +61,7 @@ import javafx.stage.Popup;
  * Reminder that when Next Step event is handled a new thread starts, executing all background model related tasks.
  * Then the main JavaFX UI thread is refreshed.
  */
-public class JavaFXController {
+public final class JavaFXController {
 
    public static final int N_ROWS = 67;
    public static final int N_COLUMNS = 53;
@@ -81,10 +83,10 @@ public class JavaFXController {
    @FXML Button upLeft;
    @FXML Label leaderboard;
    @FXML TextArea leaderText;
+
    private List<Circle> nextMoves;
-
    private Alert a;
-
+   private Popup popup;
    private SetupController controller;
    private FileChooser fileChooser;
    private Stage primaryStage;
@@ -95,6 +97,7 @@ public class JavaFXController {
 
    public JavaFXController(){
       fileChooser = new FileChooser();
+      popup = new Popup();
       fileChooser.setInitialDirectory(new File("..\\api\\src\\main\\resources"));
       a = new Alert(AlertType.NONE);
 
@@ -107,18 +110,26 @@ public class JavaFXController {
    public void init(SetupController c, Stage ps){
       if(this.controller == null) {
          this.controller = c;
-         this.primaryStage = ps;
-
-         printGrid();
-
-         //disable keypad
-         this.setDisableKeyPad(true);
-         this.leaderText.setEditable(false);
-         this.leaderText.setWrapText(true);
-         this.circuit = new Polygon();
-         this.circuitPanel.getChildren().addAll(this.circuit);
+         this.primaryStage = ps;     
       }
-      else return;
+      printGrid();
+
+      // create new circuit
+      this.circuit = new Polygon();
+      this.circuitPanel.getChildren().addAll(this.circuit);
+      this.initKeypad();
+   }
+
+   private void initKeypad(){
+      //setup keypad
+      this.setDisableKeyPad(true);
+      this.leaderText.setEditable(false);
+      this.leaderText.setWrapText(true);
+      this.leaderText.clear();
+      this.start.setDisable(false);
+      this.loadTrack.setDisable(false);
+      this.loadCars.setDisable(false);
+      this.step.setDisable(true);
    }
 
    private void printGrid(){
@@ -163,7 +174,7 @@ public class JavaFXController {
       List<Driver> driverCars = this.controller.getModel().getCurrentDrivers();
       for (Driver driver : driverCars) {
          this.leaderText.appendText("Driver: "+driver.getUsername());
-         if(driver.getInputStrategy() instanceof BotInterface) this.leaderText.appendText(" (BOT)"+System.lineSeparator());
+         if(driver.getInputStrategy() instanceof BotResolver) this.leaderText.appendText(" (BOT)"+System.lineSeparator());
          else this.leaderText.appendText(System.lineSeparator());
       }
    }
@@ -182,9 +193,25 @@ public class JavaFXController {
          a.setAlertType(AlertType.ERROR);
          a.setHeaderText("File missing or invalid");
          a.setTitle("Either track or cars are missing or invalid");
+         a.setContentText(null);
          // show the dialog
          a.show();
       }
+   }
+
+   public void handleHelpPressed(ActionEvent e){
+      // set alert type
+      a.setAlertType(AlertType.INFORMATION);
+      a.setHeaderText("Welcome in Formula 1 RaceTrack Help Section");
+      a.setTitle("Help");
+      try{
+         a.setContentText(Files.readString(Paths.get("..\\app\\src\\main\\resources\\info.txt")));
+      }
+      catch(IOException ioex){
+         ioex.printStackTrace();
+      }
+      // show the dialog
+      a.show();
    }
 
    private void displayCars(List<Driver> d){
@@ -228,16 +255,16 @@ public class JavaFXController {
    }
 
    public void displayTurnDriverMove(){
-      if(this.controller.getModel().turnDriver() != null){
+      if(this.controller.getModel().nextTurnDriver() != null){
 
-         Circle c1 = createCircle(this.controller.getModel().turnDriver().getCar().getNextPosition().getX(), 
-            this.controller.getModel().turnDriver().getCar().getNextPosition().getY(), Color.TRANSPARENT);
+         Circle c1 = createCircle(this.controller.getModel().nextTurnDriver().getCar().getNextPosition().getX(), 
+            this.controller.getModel().nextTurnDriver().getCar().getNextPosition().getY(), Color.TRANSPARENT);
          c1.setStroke(Color.CORAL);
 
          this.nextMoves.add(c1);
          for(Direction d : Direction.values()){
-            Circle c2 = createCircle(this.controller.getModel().turnDriver().getCar().getNextPosition().getAdjacent(d).getX(), 
-            this.controller.getModel().turnDriver().getCar().getNextPosition().getAdjacent(d).getY(), Color.TRANSPARENT);
+            Circle c2 = createCircle(this.controller.getModel().nextTurnDriver().getCar().getNextPosition().getAdjacent(d).getX(), 
+            this.controller.getModel().nextTurnDriver().getCar().getNextPosition().getAdjacent(d).getY(), Color.TRANSPARENT);
             c2.setStroke(Color.CORAL);
             this.nextMoves.add(c2);
          }
@@ -274,8 +301,20 @@ public class JavaFXController {
       this.primaryStage.close();
    }
 
+   public void handleRestartPressed(ActionEvent e){
+      this.controller.reset();
+      this.popup.hide();
+      this.carNames.clear();
+      this.carPoints.clear();
+      this.nextMoves.clear();
+      this.circuitPanel.getChildren().clear();
+      
+      // re initiliaze 
+      this.init(controller, primaryStage);
+      
+   }
+
    private void displayPopup(){
-      Popup popup = new Popup();
       FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/fxml/Popup.fxml")));
       try{
          loader.setController(this);
@@ -283,9 +322,9 @@ public class JavaFXController {
          Label label;
          // create a label 
          if(this.controller.getModel().getWinner() != null){
-            label = createLabel("Race winner is "+this.controller.getModel().getWinner().getUsername(), 0, 0, Color.BLACK);
+            label = createLabel("Race winner is "+this.controller.getModel().getWinner().getUsername(), 5, 5, Color.BLACK);
          }
-         else label = createLabel("No winner for this race", 0, 0, Color.BLACK);
+         else label = createLabel("No winner for this race", 5, 5, Color.BLACK);
          
          popup.getContent().add(label);
          popup.show(primaryStage);
@@ -335,9 +374,7 @@ public class JavaFXController {
       inputSend(Direction.N);
    }
 
-   public void handleRestartPressed(ActionEvent e){
-      return;
-   }
+
 
    private void displayPolygon(){
       List<Double> listOfPoints = this.controller

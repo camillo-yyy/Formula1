@@ -22,6 +22,10 @@ package it.unicam.cs.formula1.api;
 
 import java.util.List;
 
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Polygon;
+import it.unicam.cs.formula1.api.geom.Segment;
+
 public class Racetrack implements Track {
 
    private Segment startLine;

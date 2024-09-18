@@ -20,6 +20,7 @@
  */
 package it.unicam.cs.formula1.api;
 
+import it.unicam.cs.formula1.api.geom.Segment;
 
 public class RacetrackDriver implements Driver {
 
@@ -45,6 +46,10 @@ public class RacetrackDriver implements Driver {
    
    public Segment drive(){
       return this.personalCar.move(resolver.getNextMove());
+   }
+
+   public Segment drive(Direction d){
+      return this.personalCar.move(d);
    }
 
    @Override

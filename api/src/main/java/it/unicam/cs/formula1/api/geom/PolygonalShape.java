@@ -1,5 +1,5 @@
 /*
- * Created on Sat Jul 06 2024
+ * Created on Sun Jun 02 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 Samuele Camilletti
@@ -18,26 +18,28 @@
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package it.unicam.cs.formula1.api;
+package it.unicam.cs.formula1.api.geom;
+
+import java.util.List;
 
 /**
- * Defines an interface for a bot player used in a RaceTrack game
+ * Interface to define a generic shape 
  */
-public interface BotInterface {
+public interface PolygonalShape {
+   
+   /**
+    * @return the list of point of the shape
+    */
+   public List<Point> getPoints();
 
    /**
-    * @param t update track for bot interface
+    * @return starting point of the shape
     */
-   void updateTrack(Track t);
+   public Point getStartingPoint();
 
    /**
-    * @param p update current position for bot interface
+    * @return ending point of the shape
     */
-   void updatePosition(Car p);
-
-   /**
-    * @param t rule to check positions
-    */
-    void updateRule(RaceRule r);
+   public Point getEndingPoint();
 
 }

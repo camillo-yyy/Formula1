@@ -24,6 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import it.unicam.cs.formula1.api.*;
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Polygon;
+import it.unicam.cs.formula1.api.geom.Segment;
 
 /**
  * Class that implements TrackLoader

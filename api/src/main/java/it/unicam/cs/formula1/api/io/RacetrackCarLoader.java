@@ -22,18 +22,15 @@ package it.unicam.cs.formula1.api.io;
 
 import java.io.IOException;
 
-import it.unicam.cs.formula1.api.Point;
 import it.unicam.cs.formula1.api.RacetrackCar;
+import it.unicam.cs.formula1.api.geom.Point;
 import it.unicam.cs.formula1.api.Car;
 
 /**
  * Class that implements CarLoader
- * Load a RacetrackDriver with RacetrackCar from a .csv file
+ * Load a RacetrackCar from a .csv file
  * with this format:
- * Carname,X_PositionOfCar,Y_PositionOfCar,U/B depending on input logic
- * 
- * For letter U it will use first parameter 
- * For letter B it will use second parameter 
+ * X_PositionOfCar,Y_PositionOfCar
  */
 public class RacetrackCarLoader implements CarLoader {
 

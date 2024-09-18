@@ -23,54 +23,42 @@ package it.unicam.cs.formula1.api;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Segment;
 /**
  * Defines input logic for a bot given a car and a track
  * 
  * Every time a next move is requested check all directions from the current positions 
  * returning the one with most "space" available ensuring it will not return on previous positions
  */
-public class BaseBotLoader implements InputResolver, BotInterface{
-
-   private Car car;
-   private Track track;
-   private RaceRule rule;
-   private List<Point> lastPositions = new LinkedList<>(); // previous positions
+public class BaseBot implements BotResolver{
+   
    private Random num = new Random(); 
 
    @Override
+   public Direction getNextMove(Car c, Race r) {
+
+      if(r == null) return Direction.values()[num.nextInt(Direction.values().length)];
+      return this.getBestDirection(c, r);
+      
+   }
+
+   @Override
    public Direction getNextMove() {
-
-      if(car == null || track == null || rule == null) return Direction.values()[num.nextInt(Direction.values().length)];
-
-      List<Direction> availableMoves = this.getAvailableDirections(); // get available moves from current position
-      return getBestMovementAvailable(availableMoves);
-   }
-
-   @Override
-   public void updateTrack(Track t) {
-      this.track = t;
-   }
-
-   @Override
-   public void updatePosition(Car p) {
-      this.car = p;
-   }
-
-   @Override
-   public void updateRule(RaceRule r) {
-      this.rule = r;
+      return Direction.values()[num.nextInt(Direction.values().length)];
    }
 
    /**
     * @return get a list of available moves according to rule set and current car position set
     */
-   public List<Segment> getAvailableMoves(){
+   public List<Segment> getAvailableMoves(Car car, Race race){
 
       List<Segment> movs = new LinkedList<Segment>();
 
       for(Direction d : Direction.values()){
-         Segment s = new Segment(this.car.getPosition(), this.car.getNextPosition().getAdjacent(d));
-         if(this.rule.isMovementAllowed(this.track, s))
+         Segment s = new Segment(car.getPosition(), car.getNextPosition().getAdjacent(d));
+         if(race.getRaceRule().isMovementAllowed(race.getTrack(), s))
             movs.add(s);
       }
       
@@ -80,13 +68,13 @@ public class BaseBotLoader implements InputResolver, BotInterface{
    /**
     * @return get a list of available moves according to rule set and given point
     */
-    public List<Segment> getAvailableMoves(Point p){
+   public List<Segment> getAvailableMoves(Race race, Point p){
 
       List<Segment> movs = new LinkedList<Segment>();
 
       for(Direction d : Direction.values()){
          Segment s = new Segment(p, p.getAdjacent(d));
-         if(this.rule.isMovementAllowed(this.track, s))
+         if(race.getRaceRule().isMovementAllowed(race.getTrack(), s))
             movs.add(s);
       }
       
@@ -96,54 +84,60 @@ public class BaseBotLoader implements InputResolver, BotInterface{
    /**
     * @return get a list of available moves according to rule set and current car position set
     */
-    public List<Direction> getAvailableDirections(){
+   public List<Direction> getAvailableDirections(Car car, Race race){
 
       List<Direction> movs = new LinkedList<Direction>();
 
       for(Direction d : Direction.values()){
-         Segment s = new Segment(this.car.getNextPosition(), this.car.getNextPosition().getAdjacent(d));
-         if(this.rule.isMovementAllowed(this.track, s))
+         Segment s = new Segment(car.getNextPosition(), car.getNextPosition().getAdjacent(d));
+         if(race.getRaceRule().isMovementAllowed(race.getTrack(), s))
             movs.add(d);
       }
       
       return movs;
    }
-
-
+   
    /**
     * @return get the most in depth movement possible according to rule set and track
-    */
-   public Direction getBestMovementAvailable(List<Direction> moves){
-
+    */   
+   public Direction getBestDirection(Car car, Race race){
       Direction bestMove = Direction.STILL;
       int count=0;
       int max=count;
 
-      lastPositions.add(this.car.getPosition());
-      //Point lastPos = this.car.getPosition();
-
-      for (Direction direction : moves) {
-         count = 0;
-         Point nextPos = this.car.getNextPosition().getAdjacent(direction);
-
-         // loop while checking if the adjacent point is not out of the track or it was already passed
-         while(this.rule.isMovementAllowed(this.track,  new Segment(this.car.getPosition(),nextPos)) && !lastPositions.contains(nextPos) 
-         && !nextPos.equals(this.car.getPosition())) {
-
-            if(this.rule.triggersWinCon(track, new Segment(this.car.getPosition(),nextPos))) return direction;
-
-            count++;
-            //lastPos = nextPos;
-            nextPos = nextPos.getAdjacent(direction);
-         }
-         if(lastPositions.contains(nextPos)) count = 0;
-         if(count > max) {
-            max = count;
-            bestMove = direction;
+      for (Direction direction : Direction.values()) {
+         if(direction.reverse() != car.getLastDirection()) {
+            count = directionDepthness(car.getPosition(), race, direction);
+            if(count > max) {
+               max = count;
+               bestMove = direction;
+            }
          }
       }
+      if(max < 4 && car.getLastDirection() != Direction.STILL) return bestMove.reverse();
       return bestMove;
    }
 
-   
+   /**
+    * Return depthness of a direction given a point and a racetrack
+      Return 99 if direction satisfy race wincon.
+    * @param p point 
+    * @param r race
+    * @param d direction
+    * @return lenght of movement from given point moving forward passed direction following race rules
+    */
+   public int directionDepthness(Point p, Race r, Direction d){
+      int count = 0;
+      Point nextPos = p.getAdjacent(d);
+      while(r.getRaceRule().isMovementAllowed(r.getTrack(),  new Segment(p,nextPos))
+      && !nextPos.equals(p)) {
+
+         if(r.getRaceRule().triggersWinCon(r.getTrack(), new Segment(p,nextPos))) return 99;
+
+         count++;
+         nextPos = nextPos.getAdjacent(d);
+      }
+      return count;
+   }
 }
+

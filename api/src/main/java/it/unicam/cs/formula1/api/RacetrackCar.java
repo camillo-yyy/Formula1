@@ -20,15 +20,20 @@
  */
 package it.unicam.cs.formula1.api;
 
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Segment;
+
 public class RacetrackCar implements Car {
 
    private Point currentPosition;
    private Point nextPosition;
    private Status status;
+   private Direction lastDirection;
 
    public RacetrackCar(Point cp){
       this.currentPosition = cp;
       this.nextPosition = cp;
+      this.lastDirection = null;
       this.status = Status.READY;
    }
 
@@ -55,6 +60,7 @@ public class RacetrackCar implements Car {
       this.nextPosition = new Point((this.currentPosition.getX()-moveStartingPoint.getX())+this.currentPosition.getX()
                                     , (this.currentPosition.getY()-moveStartingPoint.getY())+this.currentPosition.getY());
 
+      this.lastDirection = d;
       return new Segment(moveStartingPoint, currentPosition);
    }
 
@@ -66,6 +72,11 @@ public class RacetrackCar implements Car {
    @Override
    public void setStatus(Status s) {
       this.status = s;
+   }
+
+   @Override
+   public Direction getLastDirection() {
+      return this.lastDirection;
    }
    
 }

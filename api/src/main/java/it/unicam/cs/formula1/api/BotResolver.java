@@ -1,5 +1,5 @@
 /*
- * Created on Sun Jun 02 2024
+ * Created on Sat Jul 06 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 Samuele Camilletti
@@ -18,28 +18,14 @@
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
 package it.unicam.cs.formula1.api;
 
-import java.util.List;
-
-/**
- * Interface to define a generic shape 
- */
-public interface PolygonalShape {
-   
-   /**
-    * @return the list of point of the shape
-    */
-   public List<Point> getPoints();
+public non-sealed interface BotResolver extends InputResolver {
 
    /**
-    * @return starting point of the shape
+    * @return a next direction based on given race
     */
-   public Point getStartingPoint();
-
-   /**
-    * @return ending point of the shape
-    */
-   public Point getEndingPoint();
+    Direction getNextMove(Car c, Race r);
 
 }

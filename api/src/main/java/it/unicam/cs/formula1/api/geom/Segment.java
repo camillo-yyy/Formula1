@@ -18,7 +18,7 @@
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package it.unicam.cs.formula1.api;
+package it.unicam.cs.formula1.api.geom;
 
 public final class Segment {
 
@@ -45,18 +45,23 @@ public final class Segment {
       return p1.getX()*p2.getY()-p1.getY()*p2.getX();
    }
 
-   public int orientation(Point c) {
+   private int orientation(Point c) {
       double value = (this.getY().getY() - this.getX().getY()) * (c.getX() - this.getY().getX()) - 
                      (this.getY().getX() - this.getX().getX()) * (c.getY() - this.getY().getY());
       if (Math.abs(value) < EPS) return 0;
       return (value > 0) ? -1 : +1;
     }
   
-   /**  Tests whether point 'c' is on the line segment.
+
+   /**
+    *  Tests whether point 'c' is on the line segment.
    /* Ensure first that point c is collinear to segment (a, b) and
-   /*  then check whether c is within the rectangle formed by (a, b) */
+   /*  then check whether c is within the rectangle formed by (a, b) 
+    * @param c
+    * @return true if contained in the segment
+    */
    public boolean contains(Point c) {
-   return orientation(c) == 0 && 
+      return orientation(c) == 0 && 
          Math.min(this.getX().getX(), this.getY().getX()) <= c.getX() && c.getX() <= Math.max(this.getX().getX(), this.getY().getX()) && 
          Math.min(this.getX().getY(), this.getY().getY()) <= c.getY() && c.getY() <= Math.max(this.getX().getY(), this.getY().getY());
    }
@@ -65,18 +70,18 @@ public final class Segment {
     * Check if two segments intersects (based on article "Intersection of two lines in three-space" by Ronald Goldman, 
     published in Graphics Gems, page 304).
 
-    Segment with same starting and ending point does not intersect other segments, use method contains to check single point segments.
+    Segment with equal starting and ending point does not intersect other segments, use method 'contains' to if check single point segments intersects.
     * @param i segment to check
     * @return point of intersection
     */
    public Point intersects(Segment i){
 
-      // segment given is = q + s
+      // segment passed as argument is: q + s
       Point q=i.getX();
       // get vector s
       Point s=new Point(i.getY().getX()-q.getX(), i.getY().getY()-q.getY());
 
-      // this segment is = p + r
+      // this segment is: p + r
       Point p = this.x;
       // get vector r
       Point r = new Point(this.y.getX()-p.getX(), this.y.getY()-p.getY());
@@ -89,10 +94,10 @@ public final class Segment {
       double qps = Segment.crossProduct(new Point(q.getX()-p.getX(), q.getY()-p.getY()), s);
       double t = qps / rs;
       double u = qpr / rs;
-      if(rs == 0) // if determinant is 0 then no intersection
+      if(Math.abs(rs) < EPS) // if determinant is 0 then no intersection
          return null;
       else if(rs != 0 
-      && t >= 0 // if calculated solutions t and u are within 0 and 1 then they intersects within the segment 
+      && t >= 0 // if t and u are within 0 and 1 then they intersects within the segment 
       && t <= 1 
       && u >= 0
       && u <= 1){
@@ -111,6 +116,9 @@ public final class Segment {
       return result;
    }
 
+   /**
+    * Two segments are equals if both starting point and ending point are equals.
+    */
    @Override
    public boolean equals(Object obj) {
       if (this == obj)

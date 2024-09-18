@@ -31,5 +31,19 @@ public enum Direction {
    NW,
    SW,
    NE,
-   SE
+   SE;
+
+   public Direction reverse(){
+      return switch(this){
+         case Direction.N -> Direction.S;
+         case Direction.W -> Direction.E;
+         case Direction.S -> Direction.N;
+         case Direction.E -> Direction.W;
+         case Direction.STILL -> Direction.STILL;
+         case Direction.NW -> Direction.SE;
+         case Direction.SW -> Direction.NE;
+         case Direction.SE -> Direction.NW;
+         case Direction.NE -> Direction.SW;
+      };
+   }
 }

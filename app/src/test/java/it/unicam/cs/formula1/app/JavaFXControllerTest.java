@@ -23,6 +23,9 @@ package it.unicam.cs.formula1.app;
 import org.junit.jupiter.api.Test;
 
 import it.unicam.cs.formula1.api.*;
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Polygon;
+import it.unicam.cs.formula1.api.geom.Segment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -49,8 +52,8 @@ public class JavaFXControllerTest {
                               border);
       Car c1 = new RacetrackCar(new Point(1, 2));
       Car c2 = new RacetrackCar(new Point(1, 3));
-      Driver d1 = new RacetrackDriver("46", c1, ()->{return Direction.E;});
-      Driver d2 = new RacetrackDriver("23", c2, ()->{return Direction.E;});
+      Driver d1 = new RacetrackDriver("46", c1, new BaseBot());
+      Driver d2 = new RacetrackDriver("23", c2, new BaseBot());
       LinkedList<Driver> dl = new LinkedList<Driver>();
       dl.add(d1);
       dl.add(d2);
@@ -63,6 +66,7 @@ public class JavaFXControllerTest {
       .flatMap(p -> Stream.of(p.getX()*10, p.getY()*10))
       .collect(Collectors.toList())
       ;
+
       Double[] a = new Double[array.size()];
       a = array.toArray(a);
 
@@ -72,7 +76,6 @@ public class JavaFXControllerTest {
       assertEquals(10.0, a[3]);
       assertEquals(0.0, a[13]);
 
-
-  }
+   }
 
 }

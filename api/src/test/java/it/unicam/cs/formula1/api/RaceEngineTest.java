@@ -2,13 +2,32 @@ package it.unicam.cs.formula1.api;
 
 import org.junit.jupiter.api.Test;
 
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Polygon;
+import it.unicam.cs.formula1.api.geom.Segment;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.LinkedList;
 
 public class RaceEngineTest {
+
+   public class StupidBot implements BotResolver{
+
+      @Override
+      public Direction getNextMove() {
+         return Direction.E;
+      }
+
+      @Override
+      public Direction getNextMove(Car c, Race r) {
+         return Direction.E;
+      }
+      
+   }
+
    @Test void testNextDriver() {
-      /*LinkedList<Point> s = new LinkedList<>();
+      LinkedList<Point> s = new LinkedList<>();
       s.add(new Point(0, 0));
       s.add(new Point(5, 1));
       s.add(new Point(10, 0));
@@ -20,23 +39,21 @@ public class RaceEngineTest {
       Track t = new Racetrack(new Segment(new Point(0.0, 0.0), new Point(0.0, 4.0)), 
                               new Segment(new Point(10.0, 0.0), new Point(10.0, 4.0)),
                               border);
-      Car c1 = new RacetrackCar(new Point(1, 2));
-      Car c2 = new RacetrackCar(new Point(1, 3));
-      Driver d1 = new RacetrackDriver("46", c1, ()->{return Direction.N;});
-      Driver d2 = new RacetrackDriver("23", c2, ()->{return Direction.N;});
+      Car c1 = new RacetrackCar(new Point(0, 2));
+      Car c2 = new RacetrackCar(new Point(0, 3));
+      Driver d1 = new RacetrackDriver("46", c1, new StupidBot());
+      Driver d2 = new RacetrackDriver("23", c2, new StupidBot());
       LinkedList<Driver> dl = new LinkedList<Driver>();
       dl.add(d1);
       dl.add(d2);
-      RaceEngine re = new RaceEngine(t, dl);
-      re.start();
+      RaceEngine re = new RaceEngine(t, dl, new RacetrackRule());
       assertEquals(d1, re.nextTurnDriver());
+      re.nextStep();
       assertEquals(d2, re.nextTurnDriver());
+      assertEquals(d1, re.turnDriver());
+      re.nextStep();
       assertEquals(d1, re.nextTurnDriver());
-      assertEquals(d2, re.nextTurnDriver());
-      assertEquals(d1, re.nextTurnDriver());
-      assertEquals(d2, re.nextTurnDriver());
-      assertEquals(d1, re.nextTurnDriver());*/
-
+      assertEquals(d2, re.turnDriver());
   }
 
   @Test void testStart() {
@@ -53,8 +70,8 @@ public class RaceEngineTest {
                               border);
       Car c1 = new RacetrackCar(new Point(0, 2));
       Car c2 = new RacetrackCar(new Point(0, 3));
-      Driver d1 = new RacetrackDriver("46", c1, ()->{return Direction.E;});
-      Driver d2 = new RacetrackDriver("23", c2, ()->{return Direction.E;});
+      Driver d1 = new RacetrackDriver("46", c1, new StupidBot());
+      Driver d2 = new RacetrackDriver("23", c2, new StupidBot());
       LinkedList<Driver> dl = new LinkedList<Driver>();
       dl.add(d1);
       dl.add(d2);
@@ -82,8 +99,8 @@ public class RaceEngineTest {
                               border);
       Car c1 = new RacetrackCar(new Point(0, 2));
       Car c2 = new RacetrackCar(new Point(0, 3));
-      Driver d1 = new RacetrackDriver("46", c1, ()->{return Direction.E;});
-      Driver d2 = new RacetrackDriver("23", c2, ()->{return Direction.E;});
+      Driver d1 = new RacetrackDriver("46", c1, new StupidBot());
+      Driver d2 = new RacetrackDriver("23", c2, new StupidBot());
       LinkedList<Driver> dl = new LinkedList<Driver>();
       dl.add(d1);
       dl.add(d2);

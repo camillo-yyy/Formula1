@@ -23,6 +23,8 @@ package it.unicam.cs.formula1.api;
 import java.util.Iterator;
 import java.util.List;
 
+import it.unicam.cs.formula1.api.geom.Segment;
+
 /**
  * Class that simulates a turn based racetrack match
  * Turn driver is selected through a round robin method.
@@ -50,10 +52,18 @@ public class RaceEngine implements Race{
       this.winner = null;
       this.driverIterator = this.drivers.iterator();
       this.ruleSets = s;
+
+      this.setupRace();
+      this.computeNextTurnDriver();
    }
 
    @Override
    public Driver turnDriver() {
+      return this.turnDriver;
+   }
+
+   @Override
+   public Driver nextTurnDriver() {
       return this.nextTurnDriver;
    }
 
@@ -61,17 +71,20 @@ public class RaceEngine implements Race{
     * Compute next turn driver using a round robin iterator
     * @return next turn driver
     */
-   private void nextTurnDriver() {
+   private void computeNextTurnDriver() {
       Driver ret=null;
       int counter=0;
-      if(this.status == RaceStatus.STARTED){
+
+      if(!driverIterator.hasNext()) driverIterator = this.drivers.iterator(); // reset it
+      
+      while((ret = driverIterator.next()).getCar().getStatus() != Status.ONTRACK) { 
+         if(++counter == this.drivers.size()) {
+            this.nextTurnDriver = null; // if all drivers are crashed
+            return;
+         }
          if(!driverIterator.hasNext()) driverIterator = this.drivers.iterator(); // reset it
-         
-         while((ret = driverIterator.next()).getCar().getStatus() != Status.ONTRACK) { 
-            if(++counter == this.drivers.size()) this.nextTurnDriver = null; // if all drivers are crashed
-            if(!driverIterator.hasNext()) driverIterator = this.drivers.iterator(); // reset it
-         };
-      }
+      };
+
       this.nextTurnDriver = ret;
    }
 
@@ -86,6 +99,13 @@ public class RaceEngine implements Race{
       }
       return false;
    }
+
+   private Segment computeMovement(Driver d){
+      return switch(d.getInputStrategy()){
+         case HumanResolver h-> d.drive();
+         case BotResolver b -> d.drive(b.getNextMove(d.getCar(), this));
+      };
+   }
  
    @Override
    public Driver nextStep() {
@@ -94,7 +114,7 @@ public class RaceEngine implements Race{
             this.status = RaceStatus.FINISHED;
          }
          else {
-            Segment movement = this.turnDriver.drive(); // compute movement
+            Segment movement = this.computeMovement(this.turnDriver); // compute movement
    
             // if car movement not allowed
             if(!this.ruleSets.isMovementAllowed(track, movement)) 
@@ -105,7 +125,7 @@ public class RaceEngine implements Race{
 
             checkEndRace(track, movement);
          }
-         this.nextTurnDriver();
+         this.computeNextTurnDriver();
          return this.turnDriver;
       }
       else return null;
@@ -126,18 +146,29 @@ public class RaceEngine implements Race{
       if(this.status == RaceStatus.NOTSTARTED){
          int count=0; // count how many drivers are effectively on starting line
          for (Driver driver : this.drivers) {
-            if(ruleSets.isAllowedToStart(track, driver) && !this.isOccupied(driver.getCar())) {
-               driver.getCar().setStatus(Status.ONTRACK);
+            if(driver.getCar().getStatus() == Status.ONTRACK) {
                count++;
             }
          }
          if(count > 0) {
             this.status = RaceStatus.STARTED;
-            this.nextTurnDriver();
          }
          else return false;
       }  
       return true;
+   }
+
+      /**
+    * @return true if race is setup
+    */
+    private void setupRace() {
+      if(this.status == RaceStatus.NOTSTARTED){
+         for (Driver driver : this.drivers) {
+            if(ruleSets.isAllowedToStart(track, driver) && !this.isOccupied(driver.getCar())) {
+               driver.getCar().setStatus(Status.ONTRACK);
+            }
+         }
+      }  
    }
 
    @Override

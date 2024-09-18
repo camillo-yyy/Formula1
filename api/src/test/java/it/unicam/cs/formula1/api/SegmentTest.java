@@ -2,6 +2,9 @@ package it.unicam.cs.formula1.api;
 
 import org.junit.jupiter.api.Test;
 
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Segment;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SegmentTest {

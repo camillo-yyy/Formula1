@@ -13,7 +13,7 @@
             <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="58.0" prefWidth="300.0" text="GAME OVER" />
             <Pane layoutY="97.0" prefHeight="103.0" prefWidth="300.0">
                <children>
-                  <!-- <Button fx:id="restart" layoutX="45.0" layoutY="43.0" mnemonicParsing="false" text="Restart" onAction="#handleRestartPressed" /> -->
+                  <Button fx:id="restart" layoutX="45.0" layoutY="43.0" mnemonicParsing="false" text="Restart" onAction="#handleRestartPressed" /> 
                   <Button fx:id="quit" layoutX="218.0" layoutY="43.0" mnemonicParsing="false" prefWidth="50.0" text="Quit" onAction="#handleQuitPressed" />
                </children>
             </Pane>

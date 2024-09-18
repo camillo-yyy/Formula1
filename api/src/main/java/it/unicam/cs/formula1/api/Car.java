@@ -19,6 +19,10 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package it.unicam.cs.formula1.api;
+
+import it.unicam.cs.formula1.api.geom.Point;
+import it.unicam.cs.formula1.api.geom.Segment;
+
 /**
  * Defines a generic car for a turn based 2D racing car game 
  */
@@ -55,5 +59,10 @@ public interface Car {
     * @param s new car status
     */
    void setStatus(Status s);
+
+   /**
+    * @return last direction the car moved
+    */
+   Direction getLastDirection();
    
 }

@@ -18,7 +18,7 @@
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package it.unicam.cs.formula1.api;
+package it.unicam.cs.formula1.api.geom;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.LinkedList;
  */
 public class Polygon extends PolygonalChain{
    
-    private final static double BIG_NUMBER = 1000000;
+    private final static double BIG_NUMBER = 10000000;
 
     public Polygon(List<Point> s) {
         super(s);
@@ -46,13 +46,13 @@ public class Polygon extends PolygonalChain{
     public boolean contains(Point p){
 
         List<Segment> segments = Polygon.polygonToSegments(this);
-        List<Point> tempInters;
+        List<Point> tempInters = new LinkedList<>();
         int i = 0;
 
         for(Segment ss : segments) if(ss.contains(p)) return true; // if point is contained in the segments
         do{
             // empty the list
-            tempInters = new LinkedList<>();
+            tempInters.clear();
             // creating a ray from the point to 'infinite'
             Segment ray = new Segment(p, new Point(BIG_NUMBER, p.getY()+i%this.points.size())); 
             for (Segment segment : segments) {

@@ -21,7 +21,8 @@
 package it.unicam.cs.formula1.api;
 
 /**
- * Producer/Consumer Shared variable with 2 waiting queues to set/get generic T value
+ * Producer/Consumer Shared variable with 2 waiting queues to set/get generic T value.
+ * This class guarantees thread-safety.
  */
 public final class SharedVar<T> {
 

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RacetrackCarLoaderTest {
    @Test void testParse() {
-      DriverLoader x = new RacetrackDriverLoader(new RacetrackCarLoader(), new InputLoader(), new BaseBotLoader());
+      DriverLoader x = new RacetrackDriverLoader(new RacetrackCarLoader(), new InputLoader(), new BaseBot());
 
       try{
          List<Driver> k = x.parseDrivers(Paths.get("..\\api\\src\\main\\resources\\DefaultCars1.csv"));
