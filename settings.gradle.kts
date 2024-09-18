@@ -16,5 +16,6 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
 }
 
+
 rootProject.name = "it.unicam.cs.formula1"
 include("app", "api")

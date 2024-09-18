@@ -5,6 +5,7 @@
  */
 
 plugins {
+    application
     id("buildlogic.java-application-conventions")
     id("org.openjfx.javafxplugin") version "0.1.0"
 }
