@@ -66,6 +66,7 @@ public final class JavaFXController {
    public static final int N_ROWS = 67;
    public static final int N_COLUMNS = 53;
    public static final int SCALE = 10;   
+   public static final String fileLoc = "..\\api\\src\\main\\resources";
 
    @FXML Button loadTrack;
    @FXML Button loadCars;
@@ -98,7 +99,7 @@ public final class JavaFXController {
    public JavaFXController(){
       fileChooser = new FileChooser();
       popup = new Popup();
-      fileChooser.setInitialDirectory(new File("..\\api\\src\\main\\resources"));
+      fileChooser.setInitialDirectory(new File(fileLoc));
       a = new Alert(AlertType.NONE);
 
       this.carNames = new HashMap<>();
